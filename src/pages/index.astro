@@ -1,0 +1,665 @@
+---
+const title = 'Mega Sena Generator';
+const description = 'Gerador de jogos para Mega Sena — números aleatórios, sorte garantida.';
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── Reset & Base ── */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg-base:     #080b12;
+        --bg-surface:  #0f1421;
+        --bg-card:     #141928;
+        --bg-card-alt: #1a2035;
+        --border:      rgba(255,255,255,0.07);
+        --border-focus:rgba(74,222,128,0.5);
+
+        --green-400:   #4ade80;
+        --green-500:   #22c55e;
+        --green-600:   #16a34a;
+        --green-glow:  rgba(74,222,128,0.18);
+
+        --violet-400:  #a78bfa;
+        --violet-500:  #8b5cf6;
+        --violet-glow: rgba(139,92,246,0.15);
+
+        --text-primary:   #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted:     #475569;
+
+        --radius-sm:  6px;
+        --radius-md:  12px;
+        --radius-lg:  20px;
+        --radius-xl:  28px;
+
+        --shadow-card: 0 4px 32px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
+        --shadow-glow: 0 0 32px var(--green-glow);
+        --transition:  all 0.25s cubic-bezier(0.4,0,0.2,1);
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: var(--bg-base);
+        color: var(--text-primary);
+        min-height: 100dvh;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Animated background mesh ── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 80% 60% at 20% 0%,   rgba(34,197,94,0.07)  0%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 80% 100%, rgba(139,92,246,0.07) 0%, transparent 60%),
+          radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(15,20,33,0.8)    0%, transparent 100%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── Layout ── */
+      .wrapper {
+        position: relative;
+        z-index: 1;
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 5rem;
+      }
+
+      /* ── Header ── */
+      .header { text-align: center; margin-bottom: 3.5rem; }
+
+      .logo-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, rgba(74,222,128,0.15), rgba(139,92,246,0.1));
+        border: 1px solid rgba(74,222,128,0.25);
+        border-radius: 999px;
+        padding: 0.35rem 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--green-400);
+        margin-bottom: 1.5rem;
+      }
+
+      .logo-badge .dot {
+        width: 6px; height: 6px;
+        background: var(--green-400);
+        border-radius: 50%;
+        animation: pulse-dot 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.5; transform: scale(0.7); }
+      }
+
+      .header h1 {
+        font-size: clamp(2.2rem, 5vw, 3.5rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        background: linear-gradient(135deg, #f1f5f9 30%, var(--green-400) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.75rem;
+      }
+
+      .header p {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        max-width: 420px;
+        margin: 0 auto;
+        font-weight: 400;
+      }
+
+      /* ── Control Panel ── */
+      .panel {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-card);
+      }
+
+      .controls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      @media (max-width: 520px) {
+        .controls-grid { grid-template-columns: 1fr; }
+      }
+
+      .control-group { display: flex; flex-direction: column; gap: 0.6rem; }
+
+      .control-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+
+      .control-label span {
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+      }
+
+      /* Stepper control */
+      .stepper {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        height: 52px;
+      }
+
+      .stepper-btn {
+        width: 52px;
+        height: 100%;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 1.3rem;
+        font-weight: 300;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        user-select: none;
+      }
+
+      .stepper-btn:hover:not(:disabled) {
+        background: rgba(74,222,128,0.1);
+        color: var(--green-400);
+      }
+
+      .stepper-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .stepper-value {
+        flex: 1;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        font-family: 'JetBrains Mono', monospace;
+        user-select: none;
+      }
+
+      .stepper-divider {
+        width: 1px;
+        height: 60%;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+
+      /* Generate button */
+      .btn-generate {
+        width: 100%;
+        height: 56px;
+        background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
+        border: none;
+        border-radius: var(--radius-md);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+      }
+
+      .btn-generate::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 60%);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .btn-generate:hover::before { opacity: 1; }
+      .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
+      .btn-generate:active { transform: translateY(0); }
+
+      .btn-generate .icon {
+        font-size: 1.1rem;
+        transition: transform 0.3s;
+      }
+
+      .btn-generate:hover .icon { transform: rotate(20deg); }
+
+      /* ── Results Area ── */
+      .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+        min-height: 2rem;
+      }
+
+      .results-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .results-count {
+        font-size: 0.8rem;
+        color: var(--green-400);
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .results-count.visible { opacity: 1; }
+
+      .games-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      /* ── Game Card ── */
+      .game-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        animation: slide-in 0.35s cubic-bezier(0.4,0,0.2,1) both;
+        transition: border-color 0.25s, box-shadow 0.25s;
+      }
+
+      .game-card:hover {
+        border-color: rgba(74,222,128,0.2);
+        box-shadow: 0 0 0 1px rgba(74,222,128,0.07), var(--shadow-card);
+      }
+
+      @keyframes slide-in {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .game-index {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        min-width: 3rem;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .game-numbers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        flex: 1;
+      }
+
+      .number-ball {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: -0.02em;
+        position: relative;
+        animation: pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+        transition: transform 0.2s;
+      }
+
+      .number-ball:hover { transform: scale(1.1); }
+
+      @keyframes pop-in {
+        from { opacity: 0; transform: scale(0.5); }
+        to   { opacity: 1; transform: scale(1); }
+      }
+
+      /* Number color tiers by value range */
+      .ball-tier-1 { /* 01–12 */
+        background: linear-gradient(135deg, #1e3a5f, #1e40af);
+        color: #93c5fd;
+        border: 1px solid rgba(147,197,253,0.2);
+      }
+      .ball-tier-2 { /* 13–24 */
+        background: linear-gradient(135deg, #1e3a2f, #14532d);
+        color: #86efac;
+        border: 1px solid rgba(134,239,172,0.2);
+      }
+      .ball-tier-3 { /* 25–36 */
+        background: linear-gradient(135deg, #3b1e5f, #4c1d95);
+        color: #c4b5fd;
+        border: 1px solid rgba(196,181,253,0.2);
+      }
+      .ball-tier-4 { /* 37–48 */
+        background: linear-gradient(135deg, #3b2a1e, #92400e);
+        color: #fcd34d;
+        border: 1px solid rgba(252,211,77,0.2);
+      }
+      .ball-tier-5 { /* 49–60 */
+        background: linear-gradient(135deg, #3b1e2f, #831843);
+        color: #f9a8d4;
+        border: 1px solid rgba(249,168,212,0.2);
+      }
+
+      /* ── Empty State ── */
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-muted);
+        border: 1px dashed rgba(255,255,255,0.07);
+        border-radius: var(--radius-lg);
+      }
+
+      .empty-state .icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.4;
+        display: block;
+      }
+
+      .empty-state p {
+        font-size: 0.9rem;
+      }
+
+      /* ── Footer ── */
+      .footer {
+        text-align: center;
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.78rem;
+      }
+
+      .footer a {
+        color: var(--green-400);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover { text-decoration: underline; }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: var(--bg-base); }
+      ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="logo-badge">
+          <span class="dot"></span>
+          Mega Sena
+        </div>
+        <h1>Gerador de<br />Jogos</h1>
+        <p>Gere combinações aleatórias para a Mega Sena e aumente suas chances.</p>
+      </header>
+
+      <!-- Control Panel -->
+      <section class="panel">
+        <div class="controls-grid">
+
+          <div class="control-group">
+            <label class="control-label">
+              Números por jogo
+              <span> · mín 6, máx 9</span>
+            </label>
+            <div class="stepper">
+              <button class="stepper-btn" id="nums-dec" aria-label="Diminuir números">−</button>
+              <span class="stepper-divider"></span>
+              <span class="stepper-value" id="nums-val">6</span>
+              <span class="stepper-divider"></span>
+              <button class="stepper-btn" id="nums-inc" aria-label="Aumentar números">+</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">
+              Quantidade de jogos
+              <span> · máx 10</span>
+            </label>
+            <div class="stepper">
+              <button class="stepper-btn" id="games-dec" aria-label="Diminuir jogos">−</button>
+              <span class="stepper-divider"></span>
+              <span class="stepper-value" id="games-val">1</span>
+              <span class="stepper-divider"></span>
+              <button class="stepper-btn" id="games-inc" aria-label="Aumentar jogos">+</button>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="btn-generate" id="btn-generate">
+          <span class="icon">✦</span>
+          Gerar Jogos
+        </button>
+      </section>
+
+      <!-- Results -->
+      <section>
+        <div class="results-header">
+          <span class="results-title">Seus jogos</span>
+          <span class="results-count" id="results-count"></span>
+        </div>
+
+        <div class="games-list" id="games-list">
+          <div class="empty-state" id="empty-state">
+            <span class="icon">🍀</span>
+            <p>Configure e clique em <strong>Gerar Jogos</strong> para começar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>
+          Jogue com responsabilidade &mdash; este gerador usa aleatoriedade criptográfica.<br />
+          Resultado <strong>não garante</strong> premiação. Boa sorte! 🍀
+        </p>
+      </footer>
+
+    </div>
+
+    <script>
+      // ── State ──────────────────────────────────────────────────────────────
+      let numsPerGame = 6;
+      let totalGames  = 1;
+
+      const NUMS_MIN  = 6,  NUMS_MAX  = 9;
+      const GAMES_MIN = 1,  GAMES_MAX = 10;
+      const BALL_MIN  = 1,  BALL_MAX  = 60;
+
+      // ── DOM refs ───────────────────────────────────────────────────────────
+      const numsDecBtn   = document.getElementById('nums-dec')   as HTMLButtonElement;
+      const numsIncBtn   = document.getElementById('nums-inc')   as HTMLButtonElement;
+      const numsValEl    = document.getElementById('nums-val')   as HTMLElement;
+      const gamesDecBtn  = document.getElementById('games-dec')  as HTMLButtonElement;
+      const gamesIncBtn  = document.getElementById('games-inc')  as HTMLButtonElement;
+      const gamesValEl   = document.getElementById('games-val')  as HTMLElement;
+      const generateBtn  = document.getElementById('btn-generate') as HTMLButtonElement;
+      const gamesList    = document.getElementById('games-list')  as HTMLElement;
+      const emptyState   = document.getElementById('empty-state') as HTMLElement;
+      const resultsCount = document.getElementById('results-count') as HTMLElement;
+
+      // ── Stepper helpers ────────────────────────────────────────────────────
+      function updateStepper(
+        value: number, el: HTMLElement,
+        decBtn: HTMLButtonElement, incBtn: HTMLButtonElement,
+        min: number, max: number
+      ) {
+        el.textContent = String(value);
+        decBtn.disabled = value <= min;
+        incBtn.disabled = value >= max;
+      }
+
+      function refreshSteppers() {
+        updateStepper(numsPerGame, numsValEl, numsDecBtn, numsIncBtn, NUMS_MIN, NUMS_MAX);
+        updateStepper(totalGames,  gamesValEl, gamesDecBtn, gamesIncBtn, GAMES_MIN, GAMES_MAX);
+      }
+
+      numsDecBtn.addEventListener('click', () => {
+        if (numsPerGame > NUMS_MIN) { numsPerGame--; refreshSteppers(); }
+      });
+      numsIncBtn.addEventListener('click', () => {
+        if (numsPerGame < NUMS_MAX) { numsPerGame++; refreshSteppers(); }
+      });
+      gamesDecBtn.addEventListener('click', () => {
+        if (totalGames > GAMES_MIN) { totalGames--; refreshSteppers(); }
+      });
+      gamesIncBtn.addEventListener('click', () => {
+        if (totalGames < GAMES_MAX) { totalGames++; refreshSteppers(); }
+      });
+
+      refreshSteppers();
+
+      // ── Number generation (crypto-quality randomness) ──────────────────────
+      function secureRandom(max: number): number {
+        const arr = new Uint32Array(1);
+        crypto.getRandomValues(arr);
+        return arr[0] % max;
+      }
+
+      function generateGame(count: number): number[] {
+        const pool: number[] = [];
+        for (let i = BALL_MIN; i <= BALL_MAX; i++) pool.push(i);
+
+        // Fisher-Yates shuffle using crypto random
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = secureRandom(i + 1);
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        return pool.slice(0, count).sort((a, b) => a - b);
+      }
+
+      // ── Ball tier by value ─────────────────────────────────────────────────
+      function ballTier(n: number): string {
+        if (n <= 12) return 'ball-tier-1';
+        if (n <= 24) return 'ball-tier-2';
+        if (n <= 36) return 'ball-tier-3';
+        if (n <= 48) return 'ball-tier-4';
+        return 'ball-tier-5';
+      }
+
+      // ── Render ─────────────────────────────────────────────────────────────
+      function renderGame(numbers: number[], index: number): HTMLElement {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.style.animationDelay = `${index * 60}ms`;
+
+        const idx = document.createElement('span');
+        idx.className = 'game-index';
+        idx.textContent = `#${String(index + 1).padStart(2, '0')}`;
+
+        const nums = document.createElement('div');
+        nums.className = 'game-numbers';
+
+        numbers.forEach((n, i) => {
+          const ball = document.createElement('div');
+          ball.className = `number-ball ${ballTier(n)}`;
+          ball.style.animationDelay = `${index * 60 + i * 40}ms`;
+          ball.textContent = String(n).padStart(2, '0');
+          nums.appendChild(ball);
+        });
+
+        card.appendChild(idx);
+        card.appendChild(nums);
+        return card;
+      }
+
+      function renderResults(games: number[][]) {
+        // Clear existing cards (keep empty state element in DOM but hidden)
+        const existingCards = gamesList.querySelectorAll('.game-card');
+        existingCards.forEach(el => el.remove());
+
+        if (games.length === 0) {
+          emptyState.style.display = '';
+          resultsCount.textContent = '';
+          resultsCount.classList.remove('visible');
+          return;
+        }
+
+        emptyState.style.display = 'none';
+
+        games.forEach((nums, i) => {
+          gamesList.appendChild(renderGame(nums, i));
+        });
+
+        const plural = games.length === 1 ? 'jogo gerado' : 'jogos gerados';
+        resultsCount.textContent = `${games.length} ${plural}`;
+        resultsCount.classList.add('visible');
+      }
+
+      // ── Generate action ────────────────────────────────────────────────────
+      generateBtn.addEventListener('click', () => {
+        const games: number[][] = [];
+        for (let i = 0; i < totalGames; i++) {
+          games.push(generateGame(numsPerGame));
+        }
+        renderResults(games);
+
+        // Smooth scroll to results on mobile
+        if (window.innerWidth < 640) {
+          gamesList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    </script>
+  </body>
+</html>
