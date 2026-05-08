@@ -170,21 +170,6 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
           padding: 1.25rem 1rem;
         }
 
-        .game-card {
-          padding: 1.25rem 1.25rem 1.5rem;
-          gap: 1rem;
-        }
-
-        .game-index {
-          font-size: 1.25rem;
-        }
-
-        .number-chip {
-          width: 50px;
-          height: 50px;
-          font-size: 1rem;
-        }
-
         .footer {
           margin-top: 2.5rem;
         }
@@ -309,9 +294,16 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       .results-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 0.9rem;
         margin-bottom: 1.25rem;
         min-height: 2rem;
+      }
+
+      .results-header::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(255,255,255,0.05);
       }
 
       .results-title {
@@ -323,11 +315,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       }
 
       .results-count {
-        font-size: 0.8rem;
-        color: var(--green-400);
-        font-weight: 600;
-        opacity: 0;
-        transition: opacity 0.3s;
+        display: none;
       }
 
       .results-count.visible { opacity: 1; }
@@ -335,135 +323,143 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       .games-list {
         display: flex;
         flex-direction: column;
-        gap: 0.85rem;
+        gap: 0.65rem;
       }
 
       /* ── Game Card ── */
       .game-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-xl);
-        padding: 1.5rem 1.75rem 1.75rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-        animation: slide-in 0.4s cubic-bezier(0.4,0,0.2,1) both;
-        transition: border-color 0.25s, box-shadow 0.25s;
-      }
-
-      .game-card:hover {
-        border-color: rgba(74,222,128,0.18);
-        box-shadow: 0 8px 40px rgba(0,0,0,0.35);
-      }
-
-      @keyframes slide-in {
-        from { opacity: 0; transform: translateY(14px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-
-      /* Card top row: game label left, copy button right */
-      .card-top {
+        min-height: 60px;
+        background: rgba(15,20,33,0.78);
+        border: 1px solid rgba(255,255,255,0.045);
+        border-radius: var(--radius-md);
+        padding: 0.85rem 0.9rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 1rem;
+        animation: slide-in 0.32s cubic-bezier(0.4,0,0.2,1) both;
+        transition: background 0.22s, border-color 0.22s, transform 0.22s, opacity 0.22s;
       }
 
-      .game-index {
-        font-size: 1.6rem;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        color: var(--text-primary);
-        font-family: 'JetBrains Mono', monospace;
-        line-height: 1;
+      .game-card:hover {
+        background: rgba(17,24,39,0.9);
+        border-color: rgba(255,255,255,0.075);
+        transform: translateY(-1px);
       }
 
-      /* Icon-only copy button */
-      .copy-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border);
-        background: var(--bg-card);
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: var(--transition);
-        flex-shrink: 0;
+      .game-card.removing {
+        opacity: 0;
+        transform: translateX(10px);
       }
 
-      .copy-btn:hover {
-        border-color: rgba(74,222,128,0.45);
-        color: var(--green-400);
-        background: rgba(74,222,128,0.07);
+      @keyframes slide-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
-
-      .copy-btn.copied {
-        border-color: rgba(74,222,128,0.55);
-        color: var(--green-400);
-        background: rgba(74,222,128,0.12);
-        pointer-events: none;
-      }
-
-      .copy-btn svg { display: block; }
 
       /* Numbers row */
       .game-numbers {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.6rem;
+        gap: 0.55rem;
+        align-items: center;
       }
 
-      /* Individual number mini-card */
+      /* Individual number ball */
       .number-chip {
-        width: 58px;
-        height: 58px;
-        border-radius: var(--radius-md);
-        background: var(--bg-card);
-        border: 1px solid var(--border);
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #31dc82 0%, #23c96f 100%);
+        border: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.15rem;
+        font-size: 0.74rem;
         font-weight: 800;
         font-family: 'JetBrains Mono', monospace;
-        letter-spacing: -0.01em;
-        color: var(--text-primary);
-        animation: pop-in 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
-        transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+        letter-spacing: -0.04em;
+        color: #03110a;
+        box-shadow: 0 8px 18px rgba(35,201,111,0.14), inset 0 1px 0 rgba(255,255,255,0.22);
+        animation: pop-in 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
+        transition: transform 0.16s, box-shadow 0.16s, filter 0.16s;
         cursor: default;
         user-select: none;
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* Subtle tier accent: thin top border in tier colour */
-      .number-chip::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 2px;
-        border-radius: 2px 2px 0 0;
       }
 
       .number-chip:hover {
-        transform: translateY(-4px);
-        border-color: rgba(255,255,255,0.14);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+        box-shadow: 0 12px 22px rgba(35,201,111,0.2), inset 0 1px 0 rgba(255,255,255,0.26);
       }
 
       @keyframes pop-in {
-        from { opacity: 0; transform: scale(0.7) translateY(8px); }
-        to   { opacity: 1; transform: scale(1)   translateY(0); }
+        from { opacity: 0; transform: scale(0.75); }
+        to   { opacity: 1; transform: scale(1); }
       }
 
-      /* Tier accent colours — top stripe only, text stays white */
-      .chip-tier-1::before { background: #3b82f6; }
-      .chip-tier-2::before { background: #22c55e; }
-      .chip-tier-3::before { background: #8b5cf6; }
-      .chip-tier-4::before { background: #f59e0b; }
-      .chip-tier-5::before { background: #f43f5e; }
+      .game-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        flex-shrink: 0;
+      }
+
+      .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        background: rgba(255,255,255,0.045);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .action-btn:hover {
+        background: rgba(255,255,255,0.075);
+        border-color: rgba(255,255,255,0.08);
+        color: var(--text-primary);
+      }
+
+      .copy-btn.copied {
+        color: var(--green-400);
+        background: rgba(34,197,94,0.12);
+        pointer-events: none;
+      }
+
+      .delete-btn:hover {
+        color: #f87171;
+        background: rgba(248,113,113,0.1);
+      }
+
+      .action-btn svg { display: block; }
+
+      @media (max-width: 640px) {
+        .game-card {
+          padding: 0.8rem;
+        }
+
+        .number-chip {
+          width: 32px;
+          height: 32px;
+          font-size: 0.7rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .game-card {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .game-actions {
+          align-self: flex-end;
+        }
+      }
 
       /* ── Empty State ── */
       .empty-state {
@@ -668,15 +664,13 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       const ICON_CHECK = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"/>
       </svg>`;
-
-      // ── Chip tier by value ─────────────────────────────────────────────────
-      function chipTier(n: number): string {
-        if (n <= 12) return 'chip-tier-1';
-        if (n <= 24) return 'chip-tier-2';
-        if (n <= 36) return 'chip-tier-3';
-        if (n <= 48) return 'chip-tier-4';
-        return 'chip-tier-5';
-      }
+      const ICON_TRASH = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"/>
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+      </svg>`;
 
       // ── Copy to clipboard ──────────────────────────────────────────────────
       async function copyNumbers(numbers: number[], btn: HTMLButtonElement): Promise<void> {
@@ -704,29 +698,34 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         }
       }
 
+      function updateResultsCountFromDom(): void {
+        const count = gamesList.querySelectorAll('.game-card').length;
+
+        if (count === 0) {
+          emptyState.style.display = '';
+          resultsCount.textContent = '';
+          resultsCount.classList.remove('visible');
+          return;
+        }
+
+        const plural = count === 1 ? 'jogo gerado' : 'jogos gerados';
+        resultsCount.textContent = `${count} ${plural}`;
+        resultsCount.classList.add('visible');
+      }
+
+      function deleteGame(card: HTMLElement): void {
+        card.classList.add('removing');
+        setTimeout(() => {
+          card.remove();
+          updateResultsCountFromDom();
+        }, 180);
+      }
+
       // ── Render ─────────────────────────────────────────────────────────────
       function renderGame(numbers: number[], index: number): HTMLElement {
         const card = document.createElement('div');
         card.className = 'game-card';
         card.style.animationDelay = `${index * 60}ms`;
-
-        // Top row: game label + copy icon button
-        const top = document.createElement('div');
-        top.className = 'card-top';
-
-        const idx = document.createElement('span');
-        idx.className = 'game-index';
-        idx.textContent = `# ${String(index + 1).padStart(2, '0')}`;
-
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.innerHTML = ICON_COPY;
-        copyBtn.setAttribute('aria-label', `Copiar números do jogo ${index + 1}`);
-        copyBtn.setAttribute('title', 'Copiar números');
-        copyBtn.addEventListener('click', () => copyNumbers(numbers, copyBtn));
-
-        top.appendChild(idx);
-        top.appendChild(copyBtn);
 
         // Number mini-cards row
         const nums = document.createElement('div');
@@ -734,14 +733,35 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
 
         numbers.forEach((n, i) => {
           const chip = document.createElement('div');
-          chip.className = `number-chip ${chipTier(n)}`;
+          chip.className = 'number-chip';
           chip.style.animationDelay = `${index * 60 + i * 45}ms`;
           chip.textContent = String(n).padStart(2, '0');
           nums.appendChild(chip);
         });
 
-        card.appendChild(top);
+        // Row actions
+        const actions = document.createElement('div');
+        actions.className = 'game-actions';
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'action-btn copy-btn';
+        copyBtn.innerHTML = ICON_COPY;
+        copyBtn.setAttribute('aria-label', `Copiar números do jogo ${index + 1}`);
+        copyBtn.setAttribute('title', 'Copiar números');
+        copyBtn.addEventListener('click', () => copyNumbers(numbers, copyBtn));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'action-btn delete-btn';
+        deleteBtn.innerHTML = ICON_TRASH;
+        deleteBtn.setAttribute('aria-label', `Excluir jogo ${index + 1}`);
+        deleteBtn.setAttribute('title', 'Excluir jogo');
+        deleteBtn.addEventListener('click', () => deleteGame(card));
+
+        actions.appendChild(copyBtn);
+        actions.appendChild(deleteBtn);
+
         card.appendChild(nums);
+        card.appendChild(actions);
         return card;
       }
 
