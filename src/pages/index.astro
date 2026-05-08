@@ -16,7 +16,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <style>
+    <style is:global>
       /* ── Reset & Base ── */
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -326,8 +326,8 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         gap: 0.65rem;
       }
 
-      /* ── Game Card ── */
-      .game-card {
+      /* ── Generated Game Drawer ── */
+      .game-row {
         min-height: 60px;
         background: rgba(15,20,33,0.78);
         border: 1px solid rgba(255,255,255,0.045);
@@ -341,13 +341,13 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         transition: background 0.22s, border-color 0.22s, transform 0.22s, opacity 0.22s;
       }
 
-      .game-card:hover {
+      .game-row:hover {
         background: rgba(17,24,39,0.9);
         border-color: rgba(255,255,255,0.075);
         transform: translateY(-1px);
       }
 
-      .game-card.removing {
+      .game-row.removing {
         opacity: 0;
         transform: translateX(10px);
       }
@@ -366,7 +366,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       }
 
       /* Individual number ball */
-      .number-chip {
+      .lotto-ball {
         width: 34px;
         height: 34px;
         border-radius: 999px;
@@ -387,7 +387,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         user-select: none;
       }
 
-      .number-chip:hover {
+      .lotto-ball:hover {
         transform: translateY(-2px);
         filter: brightness(1.06);
         box-shadow: 0 12px 22px rgba(35,201,111,0.2), inset 0 1px 0 rgba(255,255,255,0.26);
@@ -405,7 +405,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         flex-shrink: 0;
       }
 
-      .action-btn {
+      .game-action {
         width: 28px;
         height: 28px;
         border-radius: 8px;
@@ -419,7 +419,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         transition: var(--transition);
       }
 
-      .action-btn:hover {
+      .game-action:hover {
         background: rgba(255,255,255,0.075);
         border-color: rgba(255,255,255,0.08);
         color: var(--text-primary);
@@ -436,14 +436,14 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         background: rgba(248,113,113,0.1);
       }
 
-      .action-btn svg { display: block; }
+      .game-action svg { display: block; }
 
       @media (max-width: 640px) {
-        .game-card {
+        .game-row {
           padding: 0.8rem;
         }
 
-        .number-chip {
+        .lotto-ball {
           width: 32px;
           height: 32px;
           font-size: 0.7rem;
@@ -451,7 +451,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       }
 
       @media (max-width: 480px) {
-        .game-card {
+        .game-row {
           align-items: flex-start;
           flex-direction: column;
         }
@@ -699,7 +699,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       }
 
       function updateResultsCountFromDom(): void {
-        const count = gamesList.querySelectorAll('.game-card').length;
+        const count = gamesList.querySelectorAll('.game-row').length;
 
         if (count === 0) {
           emptyState.style.display = '';
@@ -724,7 +724,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
       // ── Render ─────────────────────────────────────────────────────────────
       function renderGame(numbers: number[], index: number): HTMLElement {
         const card = document.createElement('div');
-        card.className = 'game-card';
+        card.className = 'game-row';
         card.style.animationDelay = `${index * 60}ms`;
 
         // Number mini-cards row
@@ -733,7 +733,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
 
         numbers.forEach((n, i) => {
           const chip = document.createElement('div');
-          chip.className = 'number-chip';
+          chip.className = 'lotto-ball';
           chip.style.animationDelay = `${index * 60 + i * 45}ms`;
           chip.textContent = String(n).padStart(2, '0');
           nums.appendChild(chip);
@@ -744,14 +744,14 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         actions.className = 'game-actions';
 
         const copyBtn = document.createElement('button');
-        copyBtn.className = 'action-btn copy-btn';
+        copyBtn.className = 'game-action copy-btn';
         copyBtn.innerHTML = ICON_COPY;
         copyBtn.setAttribute('aria-label', `Copiar números do jogo ${index + 1}`);
         copyBtn.setAttribute('title', 'Copiar números');
         copyBtn.addEventListener('click', () => copyNumbers(numbers, copyBtn));
 
         const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'action-btn delete-btn';
+        deleteBtn.className = 'game-action delete-btn';
         deleteBtn.innerHTML = ICON_TRASH;
         deleteBtn.setAttribute('aria-label', `Excluir jogo ${index + 1}`);
         deleteBtn.setAttribute('title', 'Excluir jogo');
@@ -767,7 +767,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
 
       function renderResults(games: number[][]) {
         // Clear existing cards (keep empty state element in DOM but hidden)
-        const existingCards = gamesList.querySelectorAll('.game-card');
+        const existingCards = gamesList.querySelectorAll('.game-row');
         existingCards.forEach(el => el.remove());
 
         if (games.length === 0) {
