@@ -171,33 +171,18 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         }
 
         .game-card {
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          padding: 0.85rem 1rem;
-        }
-
-        .index-sep {
-          display: none;
+          padding: 1.25rem 1.25rem 1.5rem;
+          gap: 1rem;
         }
 
         .game-index {
-          width: 100%;
-          text-align: left;
-          min-width: unset;
-        }
-
-        .game-numbers {
-          gap: 0.35rem;
+          font-size: 1.25rem;
         }
 
         .number-chip {
-          height: 38px;
-          min-width: 44px;
-          font-size: 0.9rem;
-        }
-
-        .copy-btn {
-          margin-left: auto;
+          width: 50px;
+          height: 50px;
+          font-size: 1rem;
         }
 
         .footer {
@@ -355,104 +340,56 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
 
       /* ── Game Card ── */
       .game-card {
-        background: linear-gradient(135deg, #141928 0%, #0f1320 100%);
+        background: var(--bg-surface);
         border: 1px solid var(--border);
-        border-left: 3px solid var(--green-500);
-        border-radius: var(--radius-lg);
-        padding: 0.9rem 1.25rem;
+        border-radius: var(--radius-xl);
+        padding: 1.5rem 1.75rem 1.75rem;
         display: flex;
-        align-items: center;
-        gap: 1rem;
-        animation: slide-in 0.35s cubic-bezier(0.4,0,0.2,1) both;
-        transition: box-shadow 0.25s, transform 0.25s;
+        flex-direction: column;
+        gap: 1.25rem;
+        animation: slide-in 0.4s cubic-bezier(0.4,0,0.2,1) both;
+        transition: border-color 0.25s, box-shadow 0.25s;
       }
 
       .game-card:hover {
-        transform: translateX(3px);
-        box-shadow: -4px 0 20px rgba(34,197,94,0.12), var(--shadow-card);
+        border-color: rgba(74,222,128,0.18);
+        box-shadow: 0 8px 40px rgba(0,0,0,0.35);
       }
 
       @keyframes slide-in {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(14px); }
         to   { opacity: 1; transform: translateY(0); }
       }
 
-      .game-index {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        font-family: 'JetBrains Mono', monospace;
-        min-width: 2.2rem;
-        text-align: center;
-        flex-shrink: 0;
-      }
-
-      .index-sep {
-        width: 1px;
-        height: 1.75rem;
-        background: var(--border);
-        flex-shrink: 0;
-      }
-
-      .game-numbers {
+      /* Card top row: game label left, copy button right */
+      .card-top {
         display: flex;
-        flex-wrap: wrap;
         align-items: center;
-        gap: 0.4rem;
-        flex: 1;
+        justify-content: space-between;
       }
 
-      .number-chip {
-        height: 42px;
-        min-width: 50px;
-        padding: 0 0.7rem;
-        border-radius: 8px;
+      .game-index {
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1;
+      }
+
+      /* Icon-only copy button */
+      .copy-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem;
-        font-weight: 800;
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 0.01em;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.45),
-                    inset 0 1px 0 rgba(255,255,255,0.14);
-        animation: pop-in 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
-        transition: transform 0.18s, box-shadow 0.18s;
-        cursor: default;
-        user-select: none;
-      }
-
-      .number-chip:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.5),
-                    inset 0 1px 0 rgba(255,255,255,0.2);
-      }
-
-      @keyframes pop-in {
-        from { opacity: 0; transform: scale(0.65) translateY(6px); }
-        to   { opacity: 1; transform: scale(1)    translateY(0); }
-      }
-
-      /* ── Copy button ── */
-      .copy-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        padding: 0 0.85rem;
-        height: 36px;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border);
-        background: rgba(255,255,255,0.03);
-        color: var(--text-muted);
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.07em;
-        text-transform: uppercase;
         cursor: pointer;
         transition: var(--transition);
-        white-space: nowrap;
         flex-shrink: 0;
       }
 
@@ -469,27 +406,64 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         pointer-events: none;
       }
 
-      /* ── Number chip tiers — solid gradients, fully opaque ── */
-      .chip-tier-1 { /* 01–12 — blue */
-        background: linear-gradient(145deg, #2563eb, #1d4ed8);
-        color: #dbeafe;
+      .copy-btn svg { display: block; }
+
+      /* Numbers row */
+      .game-numbers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
       }
-      .chip-tier-2 { /* 13–24 — green */
-        background: linear-gradient(145deg, #16a34a, #15803d);
-        color: #dcfce7;
+
+      /* Individual number mini-card */
+      .number-chip {
+        width: 58px;
+        height: 58px;
+        border-radius: var(--radius-md);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+        animation: pop-in 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
+        transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+        cursor: default;
+        user-select: none;
+        position: relative;
+        overflow: hidden;
       }
-      .chip-tier-3 { /* 25–36 — violet */
-        background: linear-gradient(145deg, #7c3aed, #6d28d9);
-        color: #ede9fe;
+
+      /* Subtle tier accent: thin top border in tier colour */
+      .number-chip::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        border-radius: 2px 2px 0 0;
       }
-      .chip-tier-4 { /* 37–48 — amber */
-        background: linear-gradient(145deg, #d97706, #b45309);
-        color: #fef3c7;
+
+      .number-chip:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255,255,255,0.14);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
       }
-      .chip-tier-5 { /* 49–60 — rose */
-        background: linear-gradient(145deg, #e11d48, #be185d);
-        color: #ffe4e6;
+
+      @keyframes pop-in {
+        from { opacity: 0; transform: scale(0.7) translateY(8px); }
+        to   { opacity: 1; transform: scale(1)   translateY(0); }
       }
+
+      /* Tier accent colours — top stripe only, text stays white */
+      .chip-tier-1::before { background: #3b82f6; }
+      .chip-tier-2::before { background: #22c55e; }
+      .chip-tier-3::before { background: #8b5cf6; }
+      .chip-tier-4::before { background: #f59e0b; }
+      .chip-tier-5::before { background: #f43f5e; }
 
       /* ── Empty State ── */
       .empty-state {
@@ -686,6 +660,15 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         return pool.slice(0, count).sort((a, b) => a - b);
       }
 
+      // ── SVG icons ─────────────────────────────────────────────────────────
+      const ICON_COPY = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="2" width="13" height="13" rx="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </svg>`;
+      const ICON_CHECK = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>`;
+
       // ── Chip tier by value ─────────────────────────────────────────────────
       function chipTier(n: number): string {
         if (n <= 12) return 'chip-tier-1';
@@ -697,20 +680,19 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
 
       // ── Copy to clipboard ──────────────────────────────────────────────────
       async function copyNumbers(numbers: number[], btn: HTMLButtonElement): Promise<void> {
-        const text = numbers.map(n => String(n).padStart(2, '0')).join('  ');
-        const setcopied = () => {
-          btn.textContent = '✓ Copiado!';
+        const text = numbers.map(n => String(n).padStart(2, '0')).join(' ');
+        const setCopied = () => {
+          btn.innerHTML = ICON_CHECK;
           btn.classList.add('copied');
           setTimeout(() => {
-            btn.textContent = 'Copiar';
+            btn.innerHTML = ICON_COPY;
             btn.classList.remove('copied');
           }, 2000);
         };
         try {
           await navigator.clipboard.writeText(text);
-          setcopied();
+          setCopied();
         } catch {
-          // Fallback for restricted contexts
           const el = document.createElement('textarea');
           el.value = text;
           el.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
@@ -718,7 +700,7 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
           el.select();
           document.execCommand('copy');
           document.body.removeChild(el);
-          setcopied();
+          setCopied();
         }
       }
 
@@ -728,38 +710,38 @@ const description = 'Gerador de jogos para Mega Sena — números aleatórios, s
         card.className = 'game-card';
         card.style.animationDelay = `${index * 60}ms`;
 
-        // Game index label
+        // Top row: game label + copy icon button
+        const top = document.createElement('div');
+        top.className = 'card-top';
+
         const idx = document.createElement('span');
         idx.className = 'game-index';
-        idx.textContent = `#${String(index + 1).padStart(2, '0')}`;
+        idx.textContent = `# ${String(index + 1).padStart(2, '0')}`;
 
-        // Thin vertical separator
-        const sep = document.createElement('span');
-        sep.className = 'index-sep';
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = ICON_COPY;
+        copyBtn.setAttribute('aria-label', `Copiar números do jogo ${index + 1}`);
+        copyBtn.setAttribute('title', 'Copiar números');
+        copyBtn.addEventListener('click', () => copyNumbers(numbers, copyBtn));
 
-        // Number chips
+        top.appendChild(idx);
+        top.appendChild(copyBtn);
+
+        // Number mini-cards row
         const nums = document.createElement('div');
         nums.className = 'game-numbers';
 
         numbers.forEach((n, i) => {
           const chip = document.createElement('div');
           chip.className = `number-chip ${chipTier(n)}`;
-          chip.style.animationDelay = `${index * 60 + i * 40}ms`;
+          chip.style.animationDelay = `${index * 60 + i * 45}ms`;
           chip.textContent = String(n).padStart(2, '0');
           nums.appendChild(chip);
         });
 
-        // Copy button
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.textContent = 'Copiar';
-        copyBtn.setAttribute('aria-label', `Copiar números do jogo ${index + 1}`);
-        copyBtn.addEventListener('click', () => copyNumbers(numbers, copyBtn));
-
-        card.appendChild(idx);
-        card.appendChild(sep);
+        card.appendChild(top);
         card.appendChild(nums);
-        card.appendChild(copyBtn);
         return card;
       }
 
